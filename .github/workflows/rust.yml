@@ -1,0 +1,36 @@
+name: Format, Clippy and Build
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: "-D warnings"
+
+jobs:
+  fmt:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Ensures everything is formatted properly.
+      run: cargo fmt --all -- --check
+  clippy:
+    runs-on: ubuntu-latest
+    needs: fmt
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set of lints used by default to make code cleaner.
+      run: cargo clippy --all-targets --all-features -- -D clippy::all
+  build:
+    runs-on: ubuntu-latest
+    needs: clippy
+    steps:
+    - uses: actions/checkout@v2
+    - name: Ensures the code builds.
+      run: cargo build
